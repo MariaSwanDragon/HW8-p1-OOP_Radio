@@ -5,110 +5,174 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RadioTest {
-
     @Test
-    void shouldSetCurrentChannel() {
-        Radio radio = new Radio();
-        int expected = 2;
-        // Установить станцию 2
-        radio.setCurrentChannel(expected);
-        // Проверить, что станция 2 теперь текущая
-        assertEquals(expected, radio.getCurrentChannel());
+    public void shouldSetQuantityChannel() {
+        Radio radio = new Radio(30);
+        assertEquals(30, radio.getChannelsQuantity());
+
     }
 
     @Test
-    void shouldInvalidMinSetCurrentChannel() {
+    public void shouldSetQuantityChannelDefault() {
         Radio radio = new Radio();
-        int expected = radio.getCurrentChannel();
-        // Установить станцию меньше минимальной
+        assertEquals(10, radio.getChannelsQuantity());
+
+    }
+
+    //Номер текущей радиостанции изменяется в пределах от 0 до количества радиостанций, указанных при создании (см. п.1)
+//    Клиент должен иметь возможность выставлять номер радиостанции с цифрового пульта (вводя числа 0 - количество станций)
+    @Test
+    void shouldSetCurrentChannelWithCustomQuantity() {
+        Radio radio = new Radio(50);
+        radio.setCurrentChannel(30);
+        assertEquals(30, radio.getCurrentChannel());
+    }
+
+    @Test
+    void shouldSetCurrentChannelWithCustomQuantityOver() {
+        Radio radio = new Radio(50);
+        radio.setCurrentChannel(60);
+        assertEquals(0, radio.getCurrentChannel());
+    }
+
+    @Test
+    void shouldSetCurrentChannelWithCustomQuantity2() {
+        Radio radio = new Radio(50);
+        radio.setCurrentChannel(48);
+        assertEquals(48, radio.getCurrentChannel());
+    }
+
+    @Test
+    void shouldSetCurrentChannelWithCustomQuantityBelow() {
+        Radio radio = new Radio(50);
         radio.setCurrentChannel(-1);
-        // Проверить, что текущая станция не изменилась
-        assertEquals(expected, radio.getCurrentChannel());
+        assertEquals(0, radio.getCurrentChannel());
     }
 
     @Test
-    void shouldInvalidMaxSetCurrentChannel() {
-        Radio radio = new Radio();
-        int expected = radio.getCurrentChannel();
-        // Установить станцию больше максимальной
-        radio.setCurrentChannel(10);
-        // Проверить, что текущая станция не изменилась
-        assertEquals(expected, radio.getCurrentChannel());
+    void shouldSetNextChannelWithCustomQuantity() {
+        Radio radio = new Radio(50);
+        radio.setCurrentChannel(23);
+        radio.increaseChannel();
+
+        assertEquals(24, radio.getCurrentChannel());
     }
 
     @Test
-    void shouldNextRadioChannel() {
-        Radio radio = new Radio();
-        // Установить станцию 8
-        radio.setCurrentChannel(8);
-        // Нажать 2 раза next
-        radio.nextChannel();
-        radio.nextChannel();
-        // Ожидаемый результат
-        int expected = 0;
-        // Проверить, что станция 0 теперь текущая
-        assertEquals(expected, radio.getCurrentChannel());
+    void shouldSetNextChannelWithCustomQuantityOverMax() {
+        Radio radio = new Radio(50);
+        radio.setCurrentChannel(49);
+        radio.increaseChannel();
+
+        assertEquals(0, radio.getCurrentChannel());
     }
 
     @Test
-    void shouldPrevRadioChannel() {
-        Radio radio = new Radio();
-        // Установить станцию 1
-        radio.setCurrentChannel(1);
-        // Нажать 2 раза prev
+    void shouldSetPrevChannelWithCustomQuantity() {
+        Radio radio = new Radio(40);
+        radio.setCurrentChannel(24);
         radio.prevChannel();
+
+        assertEquals(23, radio.getCurrentChannel());
+    }
+
+    @Test
+    void shouldSetPrevChannelWithCustomQuantityBelowMin() {
+        Radio radio = new Radio(30);
+        radio.setCurrentChannel(0);
         radio.prevChannel();
-        // Ожидаемый результат
-        int expected = 9;
-        // Проверить, что станция 9 теперь текущая
-        assertEquals(expected, radio.getCurrentChannel());
+
+        assertEquals(29, radio.getCurrentChannel());
     }
 
     @Test
-    void shouldInvalidMaxSetCurrentVolume() {
+    void shouldSetPrevChannelWithDefaultQuantity() {
         Radio radio = new Radio();
-        // Запомнить текущую громкость
-        int expected = radio.getCurrentVolume();
-        // Установить значение громкости больше максимальной
-        radio.setCurrentVolume(11);
-        // Проверить, что текущая громкость не изменилась
-        assertEquals(expected, radio.getCurrentVolume());
+        radio.setCurrentChannel(0);
+        radio.prevChannel();
+
+        assertEquals(9, radio.getCurrentChannel());
+    }
+
+
+    @Test
+    void shouldSetNextChannelWithDefaultQuantity() {
+        Radio radio = new Radio();
+        radio.setCurrentChannel(9);
+        radio.increaseChannel();
+
+        assertEquals(0, radio.getCurrentChannel());
     }
 
     @Test
-    void shouldInvalidMinSetCurrentVolume() {
+    public void volumeIncrease() {
         Radio radio = new Radio();
-        // Запомнить текущую громкость
-        int expected = radio.getCurrentVolume();
-        // Установить значение громкости больше максимальной
+
+        radio.setCurrentVolume(5);
+        radio.increaseVolume();
+
+        assertEquals(6, radio.getCurrentVolume());
+    }
+
+    @Test
+    public void volumeIncreaseMax() {
+        Radio radio = new Radio();
+
+        radio.setCurrentVolume(99);
+        radio.increaseVolume();
+
+        assertEquals(100, radio.getCurrentVolume());
+    }
+
+    @Test
+    public void volumeOverMax() {
+        Radio radio = new Radio();
+
+        radio.setCurrentVolume(100);
+        radio.increaseVolume();
+
+        assertEquals(100, radio.getCurrentVolume());
+    }
+
+
+    @Test
+    public void volumeLower() {
+        Radio radio = new Radio();
+
+        radio.setCurrentVolume(99);
+        radio.prevVolume();
+
+        assertEquals(98, radio.getCurrentVolume());
+    }
+
+    @Test
+    public void volumeBelowMin() {
+        Radio radio = new Radio();
+
+        radio.setCurrentVolume(0);
+        radio.prevVolume();
+
+        assertEquals(0, radio.getCurrentVolume());
+    }
+
+    @Test
+    public void currentVolumeOverMax() {
+        Radio radio = new Radio();
+
+        radio.setCurrentVolume(101);
+        radio.increaseVolume();
+
+        assertEquals(1, radio.getCurrentVolume());
+    }
+
+    @Test
+    public void currentVolumeOverMin() {
+        Radio radio = new Radio();
+
         radio.setCurrentVolume(-1);
-        // Проверить, что текущая громкость не изменилась
-        assertEquals(expected, radio.getCurrentVolume());
-    }
+        radio.increaseVolume();
 
-    @Test
-    void shouldIncreaseCurrentVolume() {
-        Radio radio = new Radio();
-        // Установить текущую громкость
-        radio.setCurrentVolume(9);
-        // Нажимать кнопку увеличения громкости 2 раза
-        radio.increaseCurrentVolume();
-        radio.increaseCurrentVolume();
-        // Проверить, что громкость равна максимально возможной
-        assertEquals(radio.getMaxVolume(), radio.getCurrentVolume());
+        assertEquals(1, radio.getCurrentVolume());
     }
-
-    @Test
-    void shouldDecreaseCurrentVolume() {
-        Radio radio = new Radio();
-        // Установить текущую громкость
-        radio.setCurrentVolume(1);
-        // Нажимать кнопку уменьшения громкости 2 раза
-        radio.decreaseCurrentVolume();
-        radio.decreaseCurrentVolume();
-        // Проверить, что громкость равна минимально возможной
-        assertEquals(radio.getMinVolume(), radio.getCurrentVolume());
-    }
-
 
 }
